@@ -1,7 +1,6 @@
-const mongoose = require("mongoose");
-
-require("dotenv").config();
-
+import { configDotenv } from "dotenv";
+import mongoose from "mongoose";
+configDotenv;
 /**
  * -------------- DATABASE ----------------
  */
@@ -15,7 +14,7 @@ require("dotenv").config();
 
 const conn = process.env.DB_STRING;
 
-const connection = mongoose.createConnection(conn, {
+export const connection = mongoose.createConnection(conn, {
    useNewUrlParser: true,
    useUnifiedTopology: true,
 });
@@ -27,7 +26,4 @@ const UserSchema = new mongoose.Schema({
    salt: String,
 });
 
-const User = connection.model("User", UserSchema);
-
-// Expose the connection
-module.exports = connection;
+connection.model("User", UserSchema);

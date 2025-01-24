@@ -1,26 +1,43 @@
 import express from "express";
 import passport from "passport";
-import passwordUtils from "../lib/passwordUtils";
-import connection from "../config/database";
-const User = connection.models.User;
-const router = express.Router();
+import { connection } from "../config/database.js";
+import { genPassword, validPassword } from "../librar/passportUtils.js";
+const User = connection.model.User;
+export const router = express.Router();
+
+// const genPassword = passportUtils.genPassword;
 /**
  * -------------- POST ROUTES ----------------
  */
 
 // TODO
-router.post("/login", passport.authenticate('local') (req, res, next) => {
-    
-});
+// router.post("/login", passport.authenticate('local') (req, res, next) => {
+
+// });
 
 // TODO
-router.post("/register", (req, res, next) => {});
+router.post("/register", (req, res, next) => {
+   const saltHash = genPassword(req.body.pw);
+
+   const salt = saltHash.salt;
+   const hash = saltHash.hash;
+
+   const newUser = new User({
+      username: req.body.uname,
+      hash: hash,
+      salt: salt,
+   });
+   newUser.save().then((user) => {
+      console.log(user);
+   });
+   res.redirect("/login");
+});
 
 /**
  * -------------- GET ROUTES ----------------
  */
 
-router.get("/", (req, res, next) => {
+router.get("/home", (req, res, next) => {
    res.send('<h1>Home</h1><p>Please <a href="/register">register</a></p>');
 });
 
@@ -81,4 +98,4 @@ router.get("/login-failure", (req, res, next) => {
    res.send("You entered the wrong password.");
 });
 
-module.exports = router;
+// module.exports = router;

@@ -1,10 +1,11 @@
+import { passwordUtils } from "../passportUtils.js";
 import passport from "passport";
 import localStrategy from "passport-local";
-import connection from "./database";
+import connection from "./database.js";
 const User = connection.models.User;
 
 const strategyLocal = localStrategy.Strategy;
-
+const genPassword = passwordUtils.genPassword;
 const customFields = {
    usernameField: "uname",
    passwordField: "pw",
