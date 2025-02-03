@@ -2,35 +2,38 @@ import express from "express";
 import mongoose from "mongoose";
 import session from "express-session";
 import MongoStore from "connect-mongo";
-import passport from "passport";
-import { MongoClient } from "mongodb";
-import { router } from "./routes/index.js";
+// import MongoStore from "connect-mongo";
+// import passport from "passport";
+// import { MongoClient } from "mongodb";
+// import { router } from "./routes/index.js";
 import { config } from "dotenv";
 
-config(); // Correctly invoking dotenv configuration
+config(); // Load environment variables
 
 const app = express();
-const dbString = "mongodb://127.0.0.1:27017/";
-const dbName = "myDatabase"; // Replace with your database name
+import { MongoClient } from "mongodb";
 
-// MongoDB Client Connection
 const client = new MongoClient(dbString);
 await client.connect();
-console.log("Connected to MongoDB");
 
-// Uncomment this if you are using Mongoose
-// mongoose.connect(dbString, { useNewUrlParser: true, useUnifiedTopology: true })
-//   .then(() => console.log("Mongoose connected to MongoDB"))
-//   .catch(err => console.error("Mongoose connection error:", err));
+const sessionsStore = MongoStore.create({
+   clientPromise: Promise.resolve(client),
+   collectionName: "Employees",
+});
+
+// const client = new MongoClient(dbString);
+// // client.connect().then(() => console.log("Connected to MongoDB")).catch(err => console.error("MongoDB Connection Error:", err));
+
+// // // Connect to MongoDB using Mongoose
+// // mongoose.connect(dbString, { useNewUrlParser: true, useUnifiedTopology: true })
+// //    .then(() => console.log("Mongoose connected to MongoDB"))
+// //    .catch(err => console.error("Mongoose connection error:", err));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Session Store Setup
-const sessionsStore = MongoStore.create({
-   mongoUrl: dbString,
-   collection: "sessions",
-});
+
 
 app.use(
    session({
@@ -38,27 +41,22 @@ app.use(
       resave: false,
       saveUninitialized: true,
       store: sessionsStore,
-      cookie: {
-         maxAge: 1000 * 60 * 60 * 24, // 1 day
-      },
+      cookie: { maxAge: 1000 * 60 * 60 * 24 },
    })
 );
 
-// Passport Initialization
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 // Routes
 app.get("/", (req, res) => {
-   console.log(req.session);
-   if (req.session.viewCount) {
-      req.session.viewCount += 1;
-   } else {
-      req.session.viewCount = 1;
-   }
-   res.send(
-      `<h1>Hello Vids! You have visited this page ${req.session.viewCount} times.</h1>`
-   );
+   // if (req.session.viewCount) {
+   //    req.session.viewCount += 1;
+   // } else {
+   //    req.session.viewCount = 1;
+   // }
+   // res.send(`<h1>Hello Vids! You have visited this page ${req.session.viewCount} times.</h1>`);
+   res.send(`<h1>Hello Vids! You have visited this page 3 times.</h1>`);
 });
 
 app.use(router);
